@@ -11,6 +11,7 @@ bp = Blueprint('access', __name__, url_prefix='/api/access')
 @require_auth
 def grant_access():
     """Grant access to a doctor"""
+    print("=== Grant Access API Called ===")
     try:
         access_collection = get_access_permissions_collection()
         users_collection = get_users_collection()
@@ -19,16 +20,35 @@ def grant_access():
             return jsonify({'error': 'Database connection error'}), 503
         
         data = request.get_json()
+        print(f"Request data: {data}")
+        print(f"Request user: {request.user}")
         
-        if not data.get('doctor_id'):
-            return jsonify({'error': 'doctor_id required'}), 400
+        if not data.get('doctor_email'):
+            return jsonify({'error': 'doctor_email required'}), 400
         
         patient_id = data.get('patient_id', request.user['user_id'])
-        doctor_id = data['doctor_id']
+        doctor_email = data['doctor_email'].strip().lower()
+        print(f"Patient ID: {patient_id}, Doctor Email: {doctor_email}")
+        
+        # Basic email validation
+        if '@' not in doctor_email or '.' not in doctor_email:
+            return jsonify({'error': 'Invalid email format'}), 400
         
         # Verify user can grant for this patient
         if request.user['role'] == 'patient' and patient_id != request.user['user_id']:
             return jsonify({'error': 'Cannot grant access for other patients'}), 403
+        
+        # Find doctor by email
+        doctor = users_collection.find_one({
+            'email': doctor_email,
+            'role': 'doctor',
+            'is_active': True
+        })
+        
+        if not doctor:
+            return jsonify({'error': 'Doctor not found or inactive'}), 404
+        
+        doctor_id = str(doctor['_id'])
         
         # Check if permission already exists
         existing = access_collection.find_one({
@@ -37,7 +57,7 @@ def grant_access():
         })
         
         if existing:
-            return jsonify({'error': 'Access already granted'}), 409
+            return jsonify({'error': 'Access already granted to this doctor'}), 409
         
         # Create permission
         permission = AccessPermissionSchema.create(
@@ -52,12 +72,19 @@ def grant_access():
         
         return jsonify({
             'message': 'Access granted successfully',
-            'permission_id': str(result.inserted_id)
+            'permission_id': str(result.inserted_id),
+            'doctor': {
+                'id': doctor_id,
+                'full_name': doctor['full_name'],
+                'email': doctor['email']
+            }
         }), 201
     
     except Exception as e:
+        import traceback
         print(f"Grant access error: {e}")
-        return jsonify({'error': 'Failed to grant access'}), 500
+        print(f"Traceback: {traceback.format_exc()}")
+        return jsonify({'error': f'Failed to grant access: {str(e)}'}), 500
 
 @bp.route('/revoke', methods=['POST'])
 @require_auth
@@ -65,19 +92,38 @@ def revoke_access():
     """Revoke doctor's access"""
     try:
         access_collection = get_access_permissions_collection()
-        if access_collection is None:
+        users_collection = get_users_collection()
+        
+        if access_collection is None or users_collection is None:
             return jsonify({'error': 'Database connection error'}), 503
         
         data = request.get_json()
         
-        if not data.get('doctor_id'):
-            return jsonify({'error': 'doctor_id required'}), 400
+        if not data.get('doctor_email'):
+            return jsonify({'error': 'doctor_email required'}), 400
         
         patient_id = data.get('patient_id', request.user['user_id'])
+        doctor_email = data['doctor_email']
         
+        # Verify user can revoke for this patient
+        if request.user['role'] == 'patient' and patient_id != request.user['user_id']:
+            return jsonify({'error': 'Cannot revoke access for other patients'}), 403
+        
+        # Find doctor by email
+        doctor = users_collection.find_one({
+            'email': doctor_email,
+            'role': 'doctor'
+        })
+        
+        if not doctor:
+            return jsonify({'error': 'Doctor not found'}), 404
+        
+        doctor_id = str(doctor['_id'])
+        
+        # Delete permission
         result = access_collection.delete_one({
             'patient_id': ObjectId(patient_id),
-            'doctor_id': ObjectId(data['doctor_id'])
+            'doctor_id': ObjectId(doctor_id)
         })
         
         if result.deleted_count == 0:

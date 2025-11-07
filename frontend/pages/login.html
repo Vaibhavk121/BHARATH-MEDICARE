@@ -83,7 +83,38 @@
                     </button>
                 </form>
 
-                <div class="form-footer">
+                <!-- QR Code Login Section -->
+                <div class="divider">
+                    <span>OR</span>
+                </div>
+
+                <div class="qr-login-section">
+                    <h3 class="qr-title">
+                        <i class="fas fa-qrcode"></i> Smart Health ID Login
+                    </h3>
+                    <p class="qr-description">
+                        Scan your Smart Health ID QR code for quick login
+                    </p>
+                    
+                    <div class="qr-scanner-container" id="qrScannerContainer" style="display: none;">
+                        <div class="scanner-header">
+                            <h4>Position QR code within the frame</h4>
+                            <button type="button" class="close-scanner" onclick="stopQRScanner()">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div id="qrReader" class="qr-reader"></div>
+                        <div class="scanner-status" id="scannerStatus">
+                            <i class="fas fa-camera"></i> Camera ready - Position QR code in view
+                        </div>
+                    </div>
+
+                    <button type="button" class="qr-scan-button" id="qrScanButton" onclick="startQRScanner()">
+                        <i class="fas fa-qrcode"></i> Scan Smart Health ID
+                    </button>
+                </div>
+
+                <div class="form-footer"></div>
                     <p>
                         Don't have an account? 
                         <a href="register.html" class="link-button">Sign up here</a>
@@ -97,9 +128,13 @@
         <div class="spinner"></div>
     </div>
 
+    <!-- QR Code Scanner Library -->
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    
     <script src="../js/config.js"></script>
     <script src="../js/api.js"></script>
     <script src="../js/ui.js"></script>
     <script src="../js/auth.js"></script>
+    <script src="../js/qr-scanner.js"></script>
 </body>
 </html>

@@ -10,6 +10,12 @@ async function handleLogin(event) {
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
     
+    // Validate inputs
+    if (!email || !password) {
+        showError('Please enter both email and password');
+        return;
+    }
+    
     showLoading();
     
     try {
@@ -94,23 +100,19 @@ async function handleRegister(event) {
             body: JSON.stringify(registerData)
         });
         
-        // Different handling for doctors vs patients
-        if (response.requires_approval) {
-            showSuccess('Registration successful! Your account is pending admin approval. You will be notified once verified.', 5000);
-            
-            // Redirect to login after 3 seconds
-            setTimeout(() => {
-                window.location.href = 'login.html';
-            }, 3000);
-        } else {
-            // Patient: Directs them to log in to complete the profile
+        // Show success message based on role
+        if (role === 'patient') {
             showSuccess('Basic registration successful! Please log in immediately to complete your detailed health profile.', 5000);
-            
-            // Redirect to login page
-            setTimeout(() => {
-                window.location.href = 'login.html';
-            }, 3000); // Increased delay to 3s to read message
+        } else if (role === 'admin') {
+            showSuccess('Admin account created successfully! You can now log in.', 3000);
+        } else {
+            showSuccess('Registration successful! You can now log in.', 3000);
         }
+        
+        // Redirect to login page
+        setTimeout(() => {
+            window.location.href = 'login.html';
+        }, 3000);
         
     } catch (error) {
         showError(error.message || 'Registration failed. Please try again.');
@@ -181,16 +183,16 @@ function toggleNMCField() {
 function redirectToDashboard(role) {
     switch(role) {
         case 'admin':
-            window.location.href = 'admin-dashboard.html';
+            window.location.href = '/pages/admin-dashboard.html';
             break;
         case 'doctor':
-            window.location.href = 'doctor-dashboard.html';
+            window.location.href = '/pages/doctor-dashboard.html';
             break;
         case 'patient':
-            window.location.href = 'patient-dashboard.html';
+            window.location.href = '/pages/patient-dashboard.html';
             break;
         default:
-            window.location.href = '../index.html';
+            window.location.href = '/index.html';
     }
 }
 

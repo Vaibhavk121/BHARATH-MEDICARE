@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-SECRET_KEY = os.getenv('SECRET_KEY', 'your-secret-key-here-change-in-production')
+SECRET_KEY = os.getenv('JWT_SECRET_KEY', 'your-secret-key-here-change-in-production')
 JWT_ALGORITHM = 'HS256'
 JWT_EXPIRATION_HOURS = 24
 

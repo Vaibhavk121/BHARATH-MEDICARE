@@ -32,7 +32,7 @@ class UserSchema:
             'allergies': [],  # Initialize as empty list, not None
             'chronic_conditions': conditions,  # Initialize with diabetes if applicable
             'current_medications': [],  # Initialize as empty list, not None
-            'is_verified': True if role == 'patient' else False,
+            'is_verified': True,
             'is_active': True,
             'is_profile_complete': False if role == 'patient' else True,  # Critical: False for new patients
             'created_at': datetime.utcnow(),

@@ -18,7 +18,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     
     // Display doctor name
-    document.getElementById('doctorName').textContent = user.full_name;
+    const doctorNameElement = document.getElementById('doctorName');
+    if (doctorNameElement) {
+        doctorNameElement.textContent = user.full_name;
+    }
     
     await loadDashboardData();
 });
@@ -67,15 +70,24 @@ async function loadPatients() {
 
 // Update statistics
 function updateStats() {
-    document.getElementById('totalPatients').textContent = myPatients.length;
+    const totalPatientsElement = document.getElementById('totalPatients');
+    const totalRecordsElement = document.getElementById('totalRecords');
     
-    // Count total accessible records (simplified - would need separate API call for exact count)
-    document.getElementById('accessibleRecords').textContent = myPatients.length * 5; // Placeholder
+    if (totalPatientsElement) {
+        totalPatientsElement.textContent = myPatients.length;
+    }
+    
+    if (totalRecordsElement) {
+        // Count total accessible records (simplified - would need separate API call for exact count)
+        totalRecordsElement.textContent = myPatients.length * 5; // Placeholder
+    }
 }
 
 // Display profile
 function displayProfile(profile) {
     const profileDiv = document.getElementById('profileInfo');
+    if (!profileDiv) return;
+    
     profileDiv.innerHTML = `
         <div style="display: grid; gap: 16px;">
             <div>
@@ -103,6 +115,7 @@ function displayProfile(profile) {
 // Display patients in table
 function displayPatients() {
     const tbody = document.getElementById('patientsTableBody');
+    if (!tbody) return;
     
     if (myPatients.length === 0) {
         tbody.innerHTML = `
@@ -136,6 +149,7 @@ function displayPatients() {
 // Display recent patients
 function displayRecentPatients() {
     const container = document.getElementById('recentPatientsList');
+    if (!container) return;
     const recentPatients = myPatients.slice(0, 5);
     
     if (recentPatients.length === 0) {
@@ -164,8 +178,15 @@ async function viewPatientRecords(patientId, patientName) {
     try {
         // Note: This would need a new API endpoint to get records for a specific patient
         // For now, we'll show a placeholder
-        document.getElementById('modalPatientName').textContent = `${patientName}'s Records`;
-        document.getElementById('modalRecordsList').innerHTML = `
+        const modalPatientName = document.getElementById('modalPatientName');
+        const modalRecordsList = document.getElementById('modalRecordsList');
+        
+        if (modalPatientName) {
+            modalPatientName.textContent = `${patientName}'s Records`;
+        }
+        
+        if (modalRecordsList) {
+            modalRecordsList.innerHTML = `
             <p style="color: var(--light-text);">
                 This feature requires an additional API endpoint to fetch patient records by patient ID.
                 Contact the system administrator to enable this functionality.
@@ -175,7 +196,10 @@ async function viewPatientRecords(patientId, patientName) {
             </p>
         `;
         
-        document.getElementById('recordsModal').style.display = 'flex';
+        const recordsModal = document.getElementById('recordsModal');
+        if (recordsModal) {
+            recordsModal.style.display = 'flex';
+        }
         
     } catch (error) {
         showError('Failed to load patient records');
@@ -186,7 +210,10 @@ async function viewPatientRecords(patientId, patientName) {
 
 // Close records modal
 function closeRecordsModal() {
-    document.getElementById('recordsModal').style.display = 'none';
+    const recordsModal = document.getElementById('recordsModal');
+    if (recordsModal) {
+        recordsModal.style.display = 'none';
+    }
 }
 
 // Download patient record
@@ -229,9 +256,13 @@ async function downloadPatientRecord(recordId, fileName) {
 // Show section
 function showSection(section) {
     // Hide all sections
-    document.getElementById('dashboardSection').style.display = 'none';
-    document.getElementById('patientsSection').style.display = 'none';
-    document.getElementById('profileSection').style.display = 'none';
+    const dashboardSection = document.getElementById('dashboardSection');
+    const patientsSection = document.getElementById('patientsSection');
+    const profileSection = document.getElementById('profileSection');
+    
+    if (dashboardSection) dashboardSection.style.display = 'none';
+    if (patientsSection) patientsSection.style.display = 'none';
+    if (profileSection) profileSection.style.display = 'none';
     
     // Remove active class from all menu items
     document.querySelectorAll('.sidebar-menu-link').forEach(link => {
@@ -241,13 +272,13 @@ function showSection(section) {
     // Show selected section
     switch(section) {
         case 'dashboard':
-            document.getElementById('dashboardSection').style.display = 'block';
+            if (dashboardSection) dashboardSection.style.display = 'block';
             break;
         case 'patients':
-            document.getElementById('patientsSection').style.display = 'block';
+            if (patientsSection) patientsSection.style.display = 'block';
             break;
         case 'profile':
-            document.getElementById('profileSection').style.display = 'block';
+            if (profileSection) profileSection.style.display = 'block';
             break;
     }
 }
