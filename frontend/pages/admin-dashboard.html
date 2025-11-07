@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - BharathMedicare</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="../assets/css/dashboard.css">
+</head>
+<body>
+    <div id="loading">
+        <div class="spinner"></div>
+    </div>
+
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+                    <img src="../assets/images/logo.png" alt="Logo">
+                    <h2 class="sidebar-title">BharathMedicare</h2>
+                </div>
+                <p style="padding-left: 52px;">Admin Panel</p>
+            </div>
+            
+            <ul class="sidebar-menu">
+                <li class="sidebar-menu-item">
+                    <a href="#" class="sidebar-menu-link active" onclick="showSection('dashboard')">
+                        <i class="fas fa-chart-pie" style="margin-right: 12px; width: 20px;"></i> Dashboard
+                    </a>
+                </li>
+                <li class="sidebar-menu-item">
+                    <a href="#" class="sidebar-menu-link" onclick="showSection('pending')">
+                        <i class="fas fa-hourglass-half" style="margin-right: 12px; width: 20px;"></i> 
+                        Pending Doctors 
+                        <span id="pendingBadge" class="badge badge-warning" style="margin-left: auto;">0</span>
+                    </a>
+                </li>
+                <li class="sidebar-menu-item">
+                    <a href="#" class="sidebar-menu-link" onclick="showSection('users')">
+                        <i class="fas fa-users" style="margin-right: 12px; width: 20px;"></i> Users
+                    </a>
+                </li>
+                <li class="sidebar-menu-item">
+                    <a href="#" class="sidebar-menu-link" onclick="showSection('audit')">
+                        <i class="fas fa-clipboard-list" style="margin-right: 12px; width: 20px;"></i> Audit Logs
+                    </a>
+                </li>
+            </ul>
+
+            <div class="sidebar-footer">
+                <button class="btn btn-danger" style="width: 100%;" onclick="handleLogout()">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Dashboard Section -->
+            <section id="dashboardSection">
+                <div class="dashboard-header">
+                    <h1><i class="fas fa-tachometer-alt"></i> Admin Dashboard</h1>
+                    <p>System overview and statistics</p>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon primary">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div>
+                            <div class="stat-value" id="totalUsers">0</div>
+                            <div class="stat-label">Total Users</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon success">
+                            <i class="fas fa-user-injured"></i>
+                        </div>
+                        <div>
+                            <div class="stat-value" id="totalPatients">0</div>
+                            <div class="stat-label">Patients</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon primary">
+                            <i class="fas fa-user-md"></i>
+                        </div>
+                        <div>
+                            <div class="stat-value" id="totalDoctors">0</div>
+                            <div class="stat-label">Verified Doctors</div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card" onclick="showSection('pending')" style="cursor: pointer;">
+                        <div class="stat-icon warning">
+                            <i class="fas fa-hourglass-half"></i>
+                        </div>
+                        <div>
+                            <div class="stat-value" id="pendingDoctors">0</div>
+                            <div class="stat-label">Pending Verifications</div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon success">
+                            <i class="fas fa-file-medical"></i>
+                        </div>
+                        <div>
+                            <div class="stat-value" id="totalRecords">0</div>
+                            <div class="stat-label">Medical Records</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3 class="card-header"><i class="fas fa-chart-line"></i> Recent Activity (Last 7 Days)</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 16px;">
+                        <div>
+                            <div style="font-size: 1.8rem; font-weight: 700; color: var(--primary-color);" id="recentUploads">0</div>
+                            <div style="color: var(--text-secondary); margin-top: 4px;">New Uploads</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 1.8rem; font-weight: 700; color: var(--success-color);" id="recentRegistrations">0</div>
+                            <div style="color: var(--text-secondary); margin-top: 4px;">New Registrations</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Pending Doctors Section -->
+            <section id="pendingSection" style="display: none;">
+                <div class="dashboard-header">
+                    <h1><i class="fas fa-hourglass-half"></i> Pending Doctor Verifications</h1>
+                    <p>Review and approve doctor registrations with NMC UID verification</p>
+                </div>
+
+                <div id="pendingMessage"></div>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>NMC UID</th>
+                                <th>Registered On</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pendingDoctorsTableBody">
+                            <tr>
+                                <td colspan="6" class="text-center">Loading pending doctors...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Users Section -->
+            <section id="usersSection" style="display: none;">
+                <div class="dashboard-header">
+                    <h1><i class="fas fa-users"></i> User Management</h1>
+                    <p>Manage system users and their access</p>
+                </div>
+
+                <div class="card">
+                    <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                        <button class="btn btn-primary" onclick="filterUsers('all')">
+                            <i class="fas fa-users"></i> All Users
+                        </button>
+                        <button class="btn btn-secondary" onclick="filterUsers('patient')">
+                            <i class="fas fa-user-injured"></i> Patients
+                        </button>
+                        <button class="btn btn-secondary" onclick="filterUsers('doctor')">
+                            <i class="fas fa-user-md"></i> Doctors
+                        </button>
+                        <button class="btn btn-secondary" onclick="filterUsers('admin')">
+                            <i class="fas fa-user-shield"></i> Admins
+                        </button>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>NMC UID</th>
+                                <th>Status</th>
+                                <th>Registered</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTableBody">
+                            <tr>
+                                <td colspan="7" class="text-center">Loading users...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Audit Logs Section -->
+            <section id="auditSection" style="display: none;">
+                <div class="dashboard-header">
+                    <h1><i class="fas fa-clipboard-list"></i> Audit Logs</h1>
+                    <p>Track all system activities</p>
+                </div>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Timestamp</th>
+                                <th>User ID</th>
+                                <th>Action</th>
+                                <th>Resource Type</th>
+                                <th>Resource ID</th>
+                            </tr>
+                        </thead>
+                        <tbody id="auditLogsBody">
+                            <tr>
+                                <td colspan="5" class="text-center">Loading audit logs...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="../js/config.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/ui.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/admin-dashboard.js"></script>
+</body>
+</html>

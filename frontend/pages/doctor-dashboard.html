@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Dashboard - BharathMedicare</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="../assets/css/dashboard.css">
+</head>
+<body>
+    <div id="loading">
+        <div class="spinner"></div>
+    </div>
+
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+                    <img src="../assets/images/logo.png" alt="Logo">
+                    <h2 class="sidebar-title">BharathMedicare</h2>
+                </div>
+                <p style="padding-left: 52px;">Doctor Portal</p>
+            </div>
+            
+            <ul class="sidebar-menu">
+                <li class="sidebar-menu-item">
+                    <a href="#" class="sidebar-menu-link active" onclick="showSection('dashboard')">
+                        <i class="fas fa-home" style="margin-right: 12px; width: 20px;"></i> Dashboard
+                    </a>
+                </li>
+                <li class="sidebar-menu-item">
+                    <a href="#" class="sidebar-menu-link" onclick="showSection('patients')">
+                        <i class="fas fa-users" style="margin-right: 12px; width: 20px;"></i> My Patients
+                    </a>
+                </li>
+                <li class="sidebar-menu-item">
+                    <a href="#" class="sidebar-menu-link" onclick="showSection('records')">
+                        <i class="fas fa-folder-open" style="margin-right: 12px; width: 20px;"></i> Patient Records
+                    </a>
+                </li>
+                <li class="sidebar-menu-item">
+                    <a href="#" class="sidebar-menu-link" onclick="showSection('profile')">
+                        <i class="fas fa-user-circle" style="margin-right: 12px; width: 20px;"></i> Profile
+                    </a>
+                </li>
+            </ul>
+
+            <div class="sidebar-footer">
+                <button class="btn btn-danger" style="width: 100%;" onclick="handleLogout()">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Dashboard Section -->
+            <section id="dashboardSection">
+                <div class="dashboard-header">
+                    <h1><i class="fas fa-stethoscope"></i> Welcome, Dr. <span id="doctorName">Doctor</span>!</h1>
+                    <p>Your patient management dashboard</p>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon primary">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div>
+                            <div class="stat-value" id="totalPatients">0</div>
+                            <div class="stat-label">My Patients</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon success">
+                            <i class="fas fa-file-medical"></i>
+                        </div>
+                        <div>
+                            <div class="stat-value" id="totalRecords">0</div>
+                            <div class="stat-label">Accessible Records</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon info">
+                            <i class="fas fa-id-badge"></i>
+                        </div>
+                        <div>
+                            <div class="stat-value" id="nmcUid" style="font-size: 1.5rem;">N/A</div>
+                            <div class="stat-label">NMC UID</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3 class="card-header"><i class="fas fa-info-circle"></i> Quick Access</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-top: 16px;">
+                        <button class="btn btn-primary" onclick="showSection('patients')" style="justify-content: center;">
+                            <i class="fas fa-users"></i> View Patients
+                        </button>
+                        <button class="btn btn-secondary" onclick="showSection('records')" style="justify-content: center;">
+                            <i class="fas fa-folder-open"></i> View Records
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3 class="card-header"><i class="fas fa-shield-alt"></i> Access Information</h3>
+                    <div style="padding: 12px; background: var(--bg-secondary); border-radius: 8px; margin-top: 12px;">
+                        <p style="color: var(--text-secondary); line-height: 1.8;">
+                            <i class="fas fa-info-circle" style="color: var(--info-color);"></i>
+                            You can only access medical records of patients who have explicitly granted you permission. 
+                            All record access is logged for security and compliance purposes.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- My Patients Section -->
+            <section id="patientsSection" style="display: none;">
+                <div class="dashboard-header">
+                    <h1><i class="fas fa-users"></i> My Patients</h1>
+                    <p>Patients who have granted you access to their medical records</p>
+                </div>
+
+                <div id="patientsMessage"></div>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Patient Name</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Access Granted</th>
+                                <th>Permission Level</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="patientsTableBody">
+                            <tr>
+                                <td colspan="6" class="text-center">Loading patients...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Patient Records Section -->
+            <section id="recordsSection" style="display: none;">
+                <div class="dashboard-header">
+                    <h1><i class="fas fa-folder-open"></i> Patient Records</h1>
+                    <p>View medical records of patients who have authorized your access</p>
+                </div>
+
+                <div class="card" style="margin-bottom: 24px;">
+                    <div class="form-group">
+                        <label for="patientSelect">Select Patient</label>
+                        <select id="patientSelect" onchange="loadPatientRecords()">
+                            <option value="">-- Select a patient --</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="recordsMessage"></div>
+
+                <div id="recordsGrid" class="records-grid">
+                    <div class="card" style="text-align: center; padding: 60px 20px;">
+                        <i class="fas fa-folder-open" style="font-size: 4rem; color: var(--text-secondary); margin-bottom: 20px;"></i>
+                        <p style="color: var(--text-secondary); font-size: 1.1rem;">Select a patient to view their medical records</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Profile Section -->
+            <section id="profileSection" style="display: none;">
+                <div class="dashboard-header">
+                    <h1><i class="fas fa-user-circle"></i> My Profile</h1>
+                    <p>View your professional information</p>
+                </div>
+
+                <div class="card" style="max-width: 600px; margin: 0 auto;">
+                    <div style="text-align: center; margin-bottom: 30px;">
+                        <div style="width: 100px; height: 100px; background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; font-size: 3rem; color: white;">
+                            <i class="fas fa-user-md"></i>
+                        </div>
+                        <h2 id="profileNameDisplay" style="color: var(--text-primary); margin-bottom: 4px;">Dr. Name</h2>
+                        <p style="color: var(--text-secondary);">Healthcare Professional</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" id="profileName" readonly style="background: var(--bg-secondary);">
+                    </div>
+                    <div class="form-group">
+                        <label>Email Address</label>
+                        <input type="email" id="profileEmail" readonly style="background: var(--bg-secondary);">
+                    </div>
+                    <div class="form-group">
+                        <label>Phone Number</label>
+                        <input type="tel" id="profilePhone" readonly style="background: var(--bg-secondary);">
+                    </div>
+                    <div class="form-group">
+                        <label>NMC Unique ID</label>
+                        <input type="text" id="profileNmc" readonly style="background: var(--bg-secondary); font-family: monospace; font-weight: bold;">
+                    </div>
+                    <div class="form-group">
+                        <label>Account Type</label>
+                        <input type="text" value="Doctor / Healthcare Provider" readonly style="background: var(--bg-secondary);">
+                    </div>
+                    <div class="form-group">
+                        <label>Verification Status</label>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span class="badge badge-success" style="font-size: 1rem;">
+                                <i class="fas fa-check-circle"></i> Verified by Admin
+                            </span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Member Since</label>
+                        <input type="text" id="profileCreated" readonly style="background: var(--bg-secondary);">
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="../js/config.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/ui.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/doctor-dashboard.js"></script>
+</body>
+</html>
